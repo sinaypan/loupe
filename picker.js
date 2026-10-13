@@ -1004,6 +1004,7 @@
         { text: 'Copier le texte', main: true, run: () => copy(textOf(node), 'Texte copié.') },
         { text: 'Enregistrer en .txt', run: async () => told(await send({ loupe: 'save', data: `data:text/plain;charset=utf-8,${encodeURIComponent(textOf(node))}`, name })) },
         { text: 'Capturer en image', run: () => snap(node, name) },
+        { text: 'Données', run: () => openData(node, textOf(node)) },
       ],
     };
   };
@@ -1016,7 +1017,10 @@
       note: rows.some((row) => row.value) ? '' : 'Ce bloc ne dessine rien lui-même : ni fond, ni bord. Essaie ↑ pour viser plus large.',
       rows,
       more: [],
-      actions: [{ text: 'Capturer en image', main: true, run: () => snap(node, node.getAttribute('aria-label') || document.title) }],
+      actions: [
+        { text: 'Capturer en image', main: true, run: () => snap(node, node.getAttribute('aria-label') || document.title) },
+        { text: 'Données', run: () => openData(node, (node.innerText ?? '').trim().split('\n')[0]) },
+      ],
     };
   };
 
@@ -1233,6 +1237,117 @@
       list();
       paint();
     });
+  };
+
+  // ---------------------------------------------------------------- données
+
+  // Les adresses que la page a interrogées pour remplir son contenu (ce que
+  // F12 range sous « Fetch/XHR »), de la plus récente à la plus ancienne.
+  const dataAddresses = () => {
+    const found = new Set();
+    for (const entry of performance.getEntriesByType('resource').reverse()) {
+      if (['fetch', 'xmlhttprequest'].includes(entry.initiatorType) && web(entry.name)) found.add(entry.name.split('#')[0]);
+      if (found.size >= 40) break;
+    }
+    return [...found];
+  };
+
+  const plain = (text) => text.replace(/\s+/g, ' ').trim().toLowerCase();
+
+  // Où le texte cherché se trouve dans une réponse : son chemin dans des
+  // données rangées (JSON), « texte » dans une page, rien s'il n'y est pas.
+  const whereIn = (body, needle) => {
+    let data;
+    try {
+      data = JSON.parse(body);
+    } catch {
+      // pas des données rangées : une page, dont on lit le texte sans rien exécuter
+      const page = new DOMParser().parseFromString(body, 'text/html');
+      return plain(page.documentElement?.textContent ?? body).includes(needle) ? 'texte' : null;
+    }
+    const walk = (value, trail, depth) => {
+      if (typeof value === 'string') return plain(value).includes(needle) ? trail : null;
+      if (!value || typeof value !== 'object' || depth > 12) return null;
+      for (const [key, inner] of Object.entries(value)) {
+        const hit = walk(inner, [...trail, key], depth + 1);
+        if (hit) return hit;
+      }
+      return null;
+    };
+    const hit = walk(data, [], 0);
+    return hit ? hit.join(' › ') || 'texte' : null;
+  };
+
+  // D'où vient un texte : la liste des adresses de données de la page, et une
+  // recherche qui les relit, comme la page l'a fait, pour dire laquelle le contient.
+  const openData = (anchor, words) => {
+    const mine = ++ticket;
+    const here = location.href.split('#')[0];
+    const said = words.replace(/\s+/g, ' ').trim();
+    const needle = plain(said).slice(0, 60);
+    const entries = [
+      { address: here, label: 'La page elle-même' },
+      ...dataAddresses()
+        .filter((address) => address !== here)
+        .map((address) => {
+          const url = new URL(address);
+          return { address, label: `${url.origin === location.origin ? '' : url.hostname}${short(tidy(url.pathname), 38)}${url.search ? ' ?…' : ''}` };
+        }),
+    ];
+    const count = entries.length - 1;
+    const view = {
+      site: 'Données de la page',
+      path: needle.length >= 3 ? [`« ${short(said, 70)} »`] : [],
+      note: count
+        ? `Depuis son chargement, la page a interrogé ${number(count)} adresse${count > 1 ? 's' : ''} pour remplir son contenu. La base de données reste derrière le serveur : on ne voit que ces adresses et leurs réponses.`
+        : 'Depuis son chargement, la page n’a interrogé aucune adresse de données : son contenu est sans doute écrit dans la page elle-même.',
+      rows: [],
+      more: [],
+      actions: [],
+    };
+    const list = () => {
+      view.rows = [...entries].sort((first, second) => Boolean(second.hit) - Boolean(first.hit)).map((entry) => ({ label: entry.label, value: entry.state ?? '›', go: () => openFile(entry.address, anchor) }));
+    };
+
+    const search = async () => {
+      say('Je relis ces adresses…');
+      const queue = [...entries];
+      const read = async () => {
+        for (let entry; (entry = queue.shift()); ) {
+          try {
+            const response = await fetch(entry.address, { credentials: 'include', signal: AbortSignal.timeout(7000) });
+            if (!response.ok) throw new Error('refus');
+            entry.body = (await response.text()).slice(0, 3000000);
+          } catch {
+            entry.state = 'illisible';
+          }
+        }
+      };
+      await Promise.all([read(), read(), read(), read()]);
+      if (mine !== ticket) return;
+      // le début du texte, puis un début plus court si la page l'a recomposé
+      for (const size of [needle.length, 24]) {
+        for (const entry of entries) {
+          if (entry.body === undefined) continue;
+          entry.hit = whereIn(entry.body, needle.slice(0, size));
+          entry.state = entry.hit ? `✓ ${short(entry.hit, 26)}` : '—';
+        }
+        if (entries.some((entry) => entry.hit) || needle.length <= 24) break;
+      }
+      const unread = entries.filter((entry) => entry.body === undefined).length;
+      for (const entry of entries) delete entry.body;
+      list();
+      paint();
+      const hits = entries.filter((entry) => entry.hit);
+      const also = unread ? ` ${number(unread)} adresse${unread > 1 ? 's n’ont' : ' n’a'} pas pu être relue${unread > 1 ? 's' : ''}.` : '';
+      if (!hits.length) return say(`Introuvable dans ce que Loupe peut relire. Ce texte vient peut-être d’un envoi que Loupe ne peut pas rejouer, ou la page le fabrique elle-même.${also}`, true);
+      if (hits.every((entry) => entry.address === here)) return say(`Ce texte est écrit dans la page elle-même : il ne vient pas d’une demande à part.${also}`);
+      say(`Trouvé : en tête de liste, avec l’endroit où il est rangé dans la réponse.${also}`);
+    };
+
+    if (needle.length >= 3) view.actions = [{ text: 'Chercher mon texte', main: true, run: search }];
+    list();
+    showCard(anchor, view, 'Données', `${number(count)} adresse${count > 1 ? 's' : ''}`);
   };
 
   const closeCard = () => {
