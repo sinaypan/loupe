@@ -1327,7 +1327,7 @@
             if (!response.ok) throw new Error('refus');
             entry.body = (await response.text()).slice(0, 3000000);
           } catch {
-            entry.state = 'illisible';
+            entry.state = t('unreadable');
           }
         }
       };

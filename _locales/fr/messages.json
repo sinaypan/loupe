@@ -702,5 +702,8 @@
   },
   "loupeError": {
     "message": "Loupe a rencontré une erreur."
+  },
+  "unreadable": {
+    "message": "illisible"
   }
 }
