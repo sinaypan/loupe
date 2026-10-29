@@ -8,15 +8,15 @@ A Chrome extension that tells you where the thing you click comes from. Click an
 
 ## What it does
 
-- **The loupe.** Click the toolbar button, then "Prendre la loupe", or press `Alt+Shift+L`. The element under the mouse is outlined in pink with its kind and size; a click opens its card. While the loupe is in hand the page receives nothing: links are not followed and videos do not start. `↑` takes a wider element, `↓` a narrower one, `Esc` puts the loupe down.
-- **Images, videos, sounds, frames.** The host in large, then the folders and the file name, then weight, format, real size in pixels, duration, whether it came from Chrome's cache or the network, and who hosts it when the server lets it show (Cloudflare, Amazon, Google, Fastly, Wikimedia and a few others). "Plus" unfolds the rest: last modification date, protocol, alternative text, full address.
+- **The loupe.** Click the toolbar button, then "Take the loupe", or press `Alt+Shift+L`. The element under the mouse is outlined in pink with its kind and size; a click opens its card. While the loupe is in hand the page receives nothing: links are not followed and videos do not start. `↑` takes a wider element, `↓` a narrower one, `Esc` puts the loupe down.
+- **Images, videos, sounds, frames.** The host in large, then the folders and the file name, then weight, format, real size in pixels, duration, whether it came from Chrome's cache or the network, and who hosts it when the server lets it show (Cloudflare, Amazon, Google, Fastly, Wikimedia and a few others). "More" unfolds the rest: last modification date, protocol, alternative text, full address.
 - **It finds what a right-click cannot.** Background images, images under a transparent layer, icons that ignore the mouse, images inside shadow DOM, drawings written in the page (inline SVG).
-- **The largest version.** When the page offers several sizes of an image (`srcset`, `<picture>`), or shows a Wikipedia thumbnail, "Télécharger" takes the largest one and the card shows its weight.
+- **The largest version.** When the page offers several sizes of an image (`srcset`, `<picture>`), or shows a Wikipedia thumbnail, "Download" takes the largest one and the card shows its weight.
 - **Texts.** The font actually used (the first one of the list that is really available, with a note when the site asked for another one that is missing), size, weight, text colour and background colour. A click on a colour copies its code.
 - **Blocks.** Background, rounding, border, shadow and padding of a button, a card, a banner.
-- **Download.** Files go to a `Loupe` folder inside Downloads. A text can be saved as `.txt`, an inline drawing as `.svg`, and anything at all as a picture of what is on screen ("Capturer en image").
-- **Where a text comes from.** "Données" on the card of a text or a block lists the page itself and the data addresses the page has queried since it loaded. "Chercher mon texte" reads them again and puts first the one that contains the text, with the place where it sits in the answer (for example `questions › 0 › intitule`).
-- **The explorer.** "Explorer" opens the folder a file lives in. It lists what the page knows there (what it loaded, what it shows, what it links to), lets you walk up the address folder by folder, and lists every server the page talks to. When a server publishes the listing of a folder, the whole listing is shown.
+- **Download.** Files go to a `Loupe` folder inside Downloads. A text can be saved as `.txt`, an inline drawing as `.svg`, and anything at all as a picture of what is on screen ("Capture as image").
+- **Where a text comes from.** "Data" on the card of a text or a block lists the page itself and the data addresses the page has queried since it loaded. "Find my text" reads them again and puts first the one that contains the text, with the place where it sits in the answer (for example `questions › 0 › intitule`).
+- **The explorer.** "Explore" opens the folder a file lives in. It lists what the page knows there (what it loaded, what it shows, what it links to), lets you walk up the address folder by folder, and lists every server the page talks to. When a server publishes the listing of a folder, the whole listing is shown.
 
 <img src="screenshots/aim.png" width="100%" alt="The loupe outlining the background image of the article's header">
 
@@ -26,7 +26,7 @@ A Chrome extension that tells you where the thing you click comes from. Click an
 
 <img src="screenshots/popup.png" width="340" alt="The popup with its single button">
 
-The interface is in French. The site in the screenshots is made up for the demonstration.
+The interface follows the language of Chrome: English by default, French when Chrome is set to French. The site in the screenshots is made up for the demonstration.
 
 ## Install
 
@@ -53,7 +53,7 @@ Nothing runs until the loupe is asked for: no script is added to pages, and the 
 
 - **Reading the page.** The address, the size and the styles are read from the page itself. Load time and cache come from what Chrome measured while loading the page, when the server allows it to be read.
 - **Asking the server.** A page cannot read the weight or the type of a file that comes from another site. For those, the background script asks the file's own server for its headers only (not the file), without cookies and without saying which page asks. This is one request per card, two when a larger version exists, and one per folder opened in the explorer.
-- **Reading data again.** "Chercher mon texte" reads the page's data addresses from inside the page, the way the page did, so with your session on that site. It only reads (`GET`), at most 40 addresses, and only when you click. An address the page reached by sending something (a form post) cannot be replayed and is marked "illisible". The database itself is never visible, only these addresses and their answers.
+- **Reading data again.** "Find my text" reads the page's data addresses from inside the page, the way the page did, so with your session on that site. It only reads (`GET`), at most 40 addresses, and only when you click. An address the page reached by sending something (a form post) cannot be replayed and is marked "illisible". The database itself is never visible, only these addresses and their answers.
 - **What is refused.** Loupe only saves images, videos, sounds and texts, and names the saved file itself with a matching extension: a page cannot make it save a program disguised as a picture. Addresses on the local network are never queried unless the page itself is on it. Only real mouse clicks and key presses count, and the card lives in a closed shadow root that the page cannot read.
 - **Cost.** Putting the loupe on a page takes a few milliseconds; aiming costs about 1 to 1.5 ms per mouse move while the loupe is in hand, and nothing otherwise.
 

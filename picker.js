@@ -9,12 +9,20 @@
     return;
   }
 
+  // Textes dans la langue de Chrome (_locales), pluriels selon la règle de la langue.
+  // Script injecté dans la page : il n'utilise pas i18n.js, qui touche au document.
+  const t = (key, ...subs) => chrome.i18n.getMessage(key, subs.map(String)) || key;
+  const LANG = chrome.i18n.getUILanguage();
+  const plurals = new Intl.PluralRules(LANG);
+  const tp = (key, count, ...subs) =>
+    chrome.i18n.getMessage(`${key}_${plurals.select(count)}`, [count, ...subs].map(String)) || t(`${key}_other`, count, ...subs);
+
   const SVG = 'http://www.w3.org/2000/svg';
-  const KINDS = { aside: 'Colonne', header: 'En-tête', footer: 'Pied de page', nav: 'Menu', dialog: 'Fenêtre', form: 'Formulaire', button: 'Bouton', a: 'Lien', ul: 'Liste', ol: 'Liste', li: 'Ligne', article: 'Article', table: 'Tableau' };
-  const LABELS = { image: 'Image', video: 'Vidéo', audio: 'Son', frame: 'Cadre', canvas: 'Dessin du site', drawing: 'Dessin', text: 'Texte' };
-  const FORMATS = { jpg: 'JPEG', jpeg: 'JPEG', png: 'PNG', apng: 'PNG animé', gif: 'GIF', webp: 'WebP', avif: 'AVIF', svg: 'SVG', 'svg+xml': 'SVG', bmp: 'BMP', ico: 'ICO', 'x-icon': 'ICO', 'vnd.microsoft.icon': 'ICO', tif: 'TIFF', tiff: 'TIFF', mp4: 'MP4', m4v: 'MP4', webm: 'WebM', ogv: 'Ogg', mov: 'QuickTime', quicktime: 'QuickTime', mp3: 'MP3', mpeg: 'MP3', m4a: 'M4A', aac: 'AAC', ogg: 'Ogg', oga: 'Ogg', opus: 'Opus', wav: 'WAV', 'x-wav': 'WAV', flac: 'FLAC', weba: 'WebM' };
-  const WEIGHTS = { 100: 'Fin', 200: 'Très léger', 300: 'Léger', 400: 'Normal', 500: 'Moyen', 600: 'Demi-gras', 700: 'Gras', 800: 'Très gras', 900: 'Noir' };
-  const GENERIC = { serif: 'Police à empattements du système', 'sans-serif': 'Police sans empattements du système', monospace: 'Police à chasse fixe du système', 'system-ui': 'Police du système', 'ui-sans-serif': 'Police du système', 'ui-serif': 'Police à empattements du système', 'ui-monospace': 'Police à chasse fixe du système', 'ui-rounded': 'Police arrondie du système', cursive: 'Police manuscrite du système', fantasy: 'Police fantaisie du système', emoji: 'Police d’émojis', math: 'Police mathématique' };
+  const KINDS = { aside: t('kindAside'), header: t('kindHeader'), footer: t('kindFooter'), nav: t('kindNav'), dialog: t('kindDialog'), form: t('kindForm'), button: t('kindButton'), a: t('kindLink'), ul: t('kindList'), ol: t('kindList'), li: t('kindRow'), article: t('kindArticle'), table: t('kindTable') };
+  const LABELS = { image: t('labelImage'), video: t('labelVideo'), audio: t('labelAudio'), frame: t('labelFrame'), canvas: t('labelCanvas'), drawing: t('labelDrawing'), text: t('labelText') };
+  const FORMATS = { jpg: 'JPEG', jpeg: 'JPEG', png: 'PNG', apng: t('fmtApng'), gif: 'GIF', webp: 'WebP', avif: 'AVIF', svg: 'SVG', 'svg+xml': 'SVG', bmp: 'BMP', ico: 'ICO', 'x-icon': 'ICO', 'vnd.microsoft.icon': 'ICO', tif: 'TIFF', tiff: 'TIFF', mp4: 'MP4', m4v: 'MP4', webm: 'WebM', ogv: 'Ogg', mov: 'QuickTime', quicktime: 'QuickTime', mp3: 'MP3', mpeg: 'MP3', m4a: 'M4A', aac: 'AAC', ogg: 'Ogg', oga: 'Ogg', opus: 'Opus', wav: 'WAV', 'x-wav': 'WAV', flac: 'FLAC', weba: 'WebM' };
+  const WEIGHTS = Object.fromEntries([100, 200, 300, 400, 500, 600, 700, 800, 900].map((weight) => [weight, t(`w${weight}`)]));
+  const GENERIC = { serif: t('fontSerif'), 'sans-serif': t('fontSans'), monospace: t('fontMono'), 'system-ui': t('fontSystem'), 'ui-sans-serif': t('fontSystem'), 'ui-serif': t('fontSerif'), 'ui-monospace': t('fontMono'), 'ui-rounded': t('fontRounded'), cursive: t('fontCursive'), fantasy: t('fontFantasy'), emoji: t('fontEmoji'), math: t('fontMath') };
   const PROTOCOLS = { h2: 'HTTP/2', h3: 'HTTP/3', 'http/1.1': 'HTTP/1.1', 'http/1.0': 'HTTP/1.0' };
 
   const CSS_TEXT = `
@@ -362,16 +370,16 @@
   const kept = element('div', 'box kept');
   const tag = element('div', 'tag');
   const message = element('span', 'message');
-  message.append('Clique sur ce que tu veux connaître', element('span', 'hint', '↑ ↓ pour viser plus large'));
-  const doneButton = element('button', 'main', 'Terminé');
+  message.append(t('clickWhat'), element('span', 'hint', t('aimWider')));
+  const doneButton = element('button', 'main', t('done'));
   // La barre couvre forcément un bout de page : ce bouton l'envoie de l'autre côté.
-  const sideButton = roundButton('Déplacer la barre', 'M5 6l3-3 3 3M5 10l3 3 3-3');
+  const sideButton = roundButton(t('moveBar'), 'M5 6l3-3 3 3M5 10l3 3 3-3');
   const bar = element('div', 'bar');
   bar.append(sideButton, message, doneButton);
 
   const chip = element('span', 'chip');
   const dims = element('span', 'dims');
-  const closeButton = roundButton('Fermer la fiche', 'M4 4l8 8M12 4l-8 8');
+  const closeButton = roundButton(t('closeCard'), 'M4 4l8 8M12 4l-8 8');
   const head = element('div', 'head');
   head.append(chip, dims, closeButton);
   const site = element('div', 'site');
@@ -395,16 +403,16 @@
 
   // ---------------------------------------------------------------- écriture
 
-  const number = (value, digits = 0) => Number(value).toLocaleString('fr-FR', { maximumFractionDigits: digits });
+  const number = (value, digits = 0) => Number(value).toLocaleString(LANG, { maximumFractionDigits: digits });
   const weigh = (bytes) => {
-    if (bytes < 1024) return `${number(bytes)} octets`;
-    if (bytes < 1024 ** 2) return `${number(bytes / 1024, bytes < 10240 ? 1 : 0)} Ko`;
-    if (bytes < 1024 ** 3) return `${number(bytes / 1024 ** 2, 1)} Mo`;
-    return `${number(bytes / 1024 ** 3, 2)} Go`;
+    if (bytes < 1024) return t('sizeBytes', number(bytes));
+    if (bytes < 1024 ** 2) return t('sizeKB', number(bytes / 1024, bytes < 10240 ? 1 : 0));
+    if (bytes < 1024 ** 3) return t('sizeMB', number(bytes / 1024 ** 2, 1));
+    return t('sizeGB', number(bytes / 1024 ** 3, 2));
   };
   const pixels = (value) => `${number(parseFloat(value), 1)} px`;
   const sized = (width, height) => `${number(Math.round(width))} × ${number(Math.round(height))}`;
-  const day = (time) => new Date(time).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  const day = (time) => new Date(time).toLocaleDateString(LANG, { day: 'numeric', month: 'long', year: 'numeric' });
   const lasting = (seconds) => {
     const total = Math.round(seconds);
     const two = (value) => String(value).padStart(2, '0');
@@ -431,7 +439,7 @@
     const extras = [...url.searchParams].length;
     const parts = shown.map((folder) => `${short(folder, 28)} › `);
     if (file) parts.push(element('b', '', short(file, 70)));
-    if (extras) parts.push(`  + ${extras} paramètre${extras > 1 ? 's' : ''}`);
+    if (extras) parts.push(`  ${tp('params', extras)}`);
     return { site: url.hostname.replace(/^www\./, ''), parts };
   };
 
@@ -671,7 +679,7 @@
   // ------------------------------------------------------------------- fiche
 
   const send = (request) =>
-    chrome.runtime.sendMessage(request).catch(() => ({ ok: false, why: 'Loupe vient d’être rechargée. Recharge la page (F5), puis reprends la loupe.' }));
+    chrome.runtime.sendMessage(request).catch(() => ({ ok: false, why: t('reloaded') }));
 
   const say = (text, error, extra) => {
     status.className = error ? 'status error' : 'status';
@@ -691,17 +699,17 @@
       field.select();
       const copied = document.execCommand('copy');
       field.remove();
-      if (!copied) return say('Chrome n’a pas laissé copier.', true);
+      if (!copied) return say(t('copyRefused'), true);
     }
     say(done);
   };
 
   // Après un enregistrement : où il est, et de quoi l'ouvrir.
   const told = (result, extra = '') => {
-    if (!result?.ok) return say(result?.why ?? 'L’enregistrement a échoué.', true);
-    const open = element('button', '', 'Afficher dans le dossier');
+    if (!result?.ok) return say(result?.why ?? t('saveFailed'), true);
+    const open = element('button', '', t('showInFolder'));
     open.addEventListener('click', () => send({ loupe: 'show', id: result.id }));
-    say(`${result.done ? 'Enregistré' : 'Téléchargement en cours'} dans Téléchargements › Loupe.${extra}`, false, open);
+    say(t(result.done ? 'savedIn' : 'savingIn', extra), false, open);
   };
 
   const frames = (count) => new Promise((done) => {
@@ -720,7 +728,7 @@
     const result = await send({ loupe: 'capture', rect: { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom }, view: { width: innerWidth, height: innerHeight }, name });
     host.style.removeProperty('visibility');
     draw();
-    told(result, fits ? '' : ' Seule la partie visible à l’écran est sur l’image.');
+    told(result, fits ? '' : t('onlyVisible'));
   };
 
   const blobToData = (blob) => new Promise((done, failed) => {
@@ -749,19 +757,19 @@
     const address = subject.larger || subject.url;
     const name = nameFor(address, subject.said);
     if (/^data:/i.test(address)) return told(await send({ loupe: 'save', data: address, name }));
-    say('Téléchargement…');
+    say(t('downloading'));
     let result = web(address) ? await send({ loupe: 'download', url: address, name }) : null;
     if (!result?.ok) result = (await throughPage(address, name)) ?? result;
     // La grande version refusée : celle qui est affichée, au moins.
     if (!result?.ok && subject.larger && web(subject.url)) {
       const shown = await send({ loupe: 'download', url: subject.url, name: nameFor(subject.url, subject.said) });
-      if (shown.ok) return told(shown, ' Le site a refusé la grande version : c’est celle affichée.');
+      if (shown.ok) return told(shown, t('largeRefused'));
     }
-    if (result?.ok) return told(result, subject.larger ? ' C’est la plus grande version que le site propose.' : '');
+    if (result?.ok) return told(result, subject.larger ? t('largestOffered') : '');
     // Reste la photo de ce qui est affiché.
-    const photo = element('button', '', 'Capturer en image');
+    const photo = element('button', '', t('captureImage'));
     photo.addEventListener('click', () => snap(subject.node, name));
-    say(result?.why ?? 'Le site a refusé d’envoyer le fichier.', true, subject.node ? photo : null);
+    say(result?.why ?? t('siteRefused'), true, subject.node ? photo : null);
   };
 
   // Un dessin SVG en fichier : sa copie, avec la couleur que la page lui donne
@@ -798,27 +806,27 @@
     if (widest > 0) {
       const same = corners.every((corner) => corner === corners[0]);
       const full = same && (corners[0].includes('%') ? parseFloat(corners[0]) >= 50 : widest >= Math.min(rect.width, rect.height) / 2);
-      rounding = full ? 'Complet' : same ? pixels(corners[0]) : corners.map((corner) => number(parseFloat(corner), 1)).join(' · ') + ' px';
+      rounding = full ? t('full') : same ? pixels(corners[0]) : corners.map((corner) => number(parseFloat(corner), 1)).join(' · ') + ' px';
     }
     const edge = ['Top', 'Right', 'Bottom', 'Left'].find((side) => parseFloat(style[`border${side}Width`]) > 0 && style[`border${side}Style`] !== 'none');
-    const border = edge ? { ...colorRow('Bordure', style[`border${edge}Color`]) } : { label: 'Bordure', value: '' };
+    const border = edge ? { ...colorRow(t('rowBorder'), style[`border${edge}Color`]) } : { label: t('rowBorder'), value: '' };
     if (border.value) border.value = `${pixels(style[`border${edge}Width`])} · ${border.value}`;
     const pads = [style.paddingTop, style.paddingRight, style.paddingBottom, style.paddingLeft].map((pad) => parseFloat(pad) || 0);
     const padding = pads.some(Boolean) ? (pads.every((pad) => pad === pads[0]) ? pixels(pads[0]) : pads[0] === pads[2] && pads[1] === pads[3] ? `${number(pads[0], 1)} · ${number(pads[1], 1)} px` : `${pads.map((pad) => number(pad, 1)).join(' · ')} px`) : '';
-    const fill = colorRow('Fond', style.backgroundColor);
-    if (!fill.value && /gradient\(/.test(style.backgroundImage)) fill.value = 'Un dégradé';
-    return [fill, { label: 'Arrondi', value: rounding }, border, { label: 'Ombre', value: style.boxShadow === 'none' ? '' : style.boxShadow, tall: true }, { label: 'Marges intérieures', value: padding }];
+    const fill = colorRow(t('rowBackground'), style.backgroundColor);
+    if (!fill.value && /gradient\(/.test(style.backgroundImage)) fill.value = t('aGradient');
+    return [fill, { label: t('rowRounding'), value: rounding }, border, { label: t('rowShadow'), value: style.boxShadow === 'none' ? '' : style.boxShadow, tall: true }, { label: t('rowPadding'), value: padding }];
   };
 
   // La couleur de fond que l'on voit derrière l'élément : la sienne, sinon celle d'un parent.
   const backdrop = (node) => {
     for (let current = node; current; current = parentOf(current)) {
       const style = getComputedStyle(current);
-      if (style.backgroundImage !== 'none') return { label: 'Fond', value: /url\(/.test(style.backgroundImage) ? 'Une image' : 'Un dégradé' };
-      const row = colorRow('Fond', style.backgroundColor);
+      if (style.backgroundImage !== 'none') return { label: t('rowBackground'), value: /url\(/.test(style.backgroundImage) ? t('anImage') : t('aGradient') };
+      const row = colorRow(t('rowBackground'), style.backgroundColor);
       if (row.value) return row;
     }
-    return { label: 'Fond', value: '' };
+    return { label: t('rowBackground'), value: '' };
   };
 
   // Ce que la page a mesuré en chargeant le fichier, quand le serveur le laisse lire.
@@ -831,7 +839,7 @@
     return {
       size: entry.encodedBodySize || 0,
       type: entry.contentType ?? '',
-      loaded: cached ? 'depuis le cache de Chrome' : open ? `depuis Internet, en ${time}` : '',
+      loaded: cached ? t('loadedCache') : open ? t('loadedNet', time) : '',
       protocol: PROTOCOLS[entry.nextHopProtocol] ?? '',
     };
   };
@@ -853,18 +861,18 @@
       (extra?.more ? view.more : view.rows).push(entry);
       return entry;
     };
-    const weight = row('Poids');
-    const format = row('Format');
-    const size = row('Taille', subject.width && subject.height ? `${sized(subject.width, subject.height)} px` : '');
-    const time = row('Durée', Number.isFinite(subject.time) && subject.time > 0 ? lasting(subject.time) : '');
-    const loaded = row('Chargement');
-    const server = row('Serveur');
-    const larger = row('Plus grande version', '', { more: true });
-    const modified = row('Dernière modification', '', { more: true });
-    const protocol = row('Protocole', '', { more: true });
-    row('Description', subject.said?.trim() ? short(subject.said.trim(), 160) : '', { more: true });
-    const software = row('Logiciel du serveur', '', { more: true });
-    const capture = { text: 'Capturer en image', run: () => snap(node, nameFor('', subject.said)) };
+    const weight = row(t('rowWeight'));
+    const format = row(t('rowFormat'));
+    const size = row(t('rowSize'), subject.width && subject.height ? `${sized(subject.width, subject.height)} px` : '');
+    const time = row(t('rowDuration'), Number.isFinite(subject.time) && subject.time > 0 ? lasting(subject.time) : '');
+    const loaded = row(t('rowLoaded'));
+    const server = row(t('rowServer'));
+    const larger = row(t('rowLarger'), '', { more: true });
+    const modified = row(t('rowModified'), '', { more: true });
+    const protocol = row(t('rowProtocol'), '', { more: true });
+    row(t('rowDescription'), subject.said?.trim() ? short(subject.said.trim(), 160) : '', { more: true });
+    const software = row(t('rowSoftware'), '', { more: true });
+    const capture = { text: t('captureImage'), run: () => snap(node, nameFor('', subject.said)) };
 
     if (web(url)) {
       const { site: from, parts } = pieces(url);
@@ -875,18 +883,18 @@
       format.value = formatOf(seen.type, url);
       loaded.value = seen.loaded ?? '';
       protocol.value = seen.protocol ?? '';
-      row('Adresse', url, { more: true, tall: true });
-      const copyAddress = { text: 'Copier l’adresse', run: () => copy(url, 'Adresse copiée.') };
-      const openIt = { text: 'Ouvrir', run: () => window.open(url, '_blank', 'noopener') };
+      row(t('rowAddress'), url, { more: true, tall: true });
+      const copyAddress = { text: t('copyAddress'), run: () => copy(url, t('addressCopied')) };
+      const openIt = { text: t('open'), run: () => window.open(url, '_blank', 'noopener') };
       // Le dossier où ce fichier est rangé, et ce que la page connaît autour.
-      const explore = { text: 'Explorer', run: () => openFolder(folderOf(url), anchor) };
+      const explore = { text: t('explore'), run: () => openFolder(folderOf(url), anchor) };
       if (kind === 'frame') {
-        view.note = 'Un cadre : une autre page, affichée dans celle-ci.';
+        view.note = t('frameNote');
         view.actions = [{ ...capture, main: true }, copyAddress, openIt, explore];
       } else if (kind === 'other') {
         view.actions = [copyAddress, openIt, explore];
       } else {
-        view.actions = [{ text: 'Télécharger', main: true, run: () => fetchFile(subject) }, copyAddress, openIt, explore];
+        view.actions = [{ text: t('download'), main: true, run: () => fetchFile(subject) }, copyAddress, openIt, explore];
       }
       // Le serveur complète : le poids exact, le format, l'hébergeur.
       if (kind !== 'frame') {
@@ -900,7 +908,7 @@
           paint();
         });
         if (subject.larger) {
-          larger.value = 'disponible';
+          larger.value = t('available');
           send({ loupe: 'details', url: subject.larger }).then((answer) => {
             if (!fresh() || !answer.ok || !answer.size) return;
             larger.value = weigh(answer.size);
@@ -909,24 +917,24 @@
         }
       }
     } else if (/^data:/i.test(url)) {
-      view.site = 'Écrite dans la page';
-      view.note = 'Pas de fichier à part : cette image est écrite dans le code de la page elle-même.';
+      view.site = t('writtenInPage');
+      view.note = t('writtenNote');
       weight.value = weigh(dataWeight(url));
       format.value = formatOf(/^data:([^;,]+)/i.exec(url)?.[1], '');
-      view.actions = [{ text: 'Télécharger', main: true, run: () => fetchFile(subject) }, capture];
+      view.actions = [{ text: t('download'), main: true, run: () => fetchFile(subject) }, capture];
     } else if (kind === 'image' && /^blob:/i.test(url)) {
-      view.site = 'Fabriquée par la page';
-      view.note = 'Le site a fabriqué cette image dans ton navigateur : elle n’a pas d’adresse sur Internet.';
-      view.actions = [{ text: 'Télécharger', main: true, run: () => fetchFile(subject) }, capture];
+      view.site = t('madeByPage');
+      view.note = t('madeNote');
+      view.actions = [{ text: t('download'), main: true, run: () => fetchFile(subject) }, capture];
     } else if (kind === 'video' || kind === 'audio') {
       // YouTube et les sites du même genre : dire d'abord que ce n'est pas une panne.
       const here = location.hostname.replace(/^www\./, '');
-      view.site = 'Téléchargement impossible ici';
-      view.note = `${here} n’envoie pas ${kind === 'video' ? 'cette vidéo' : 'ce son'} en un fichier, mais en centaines de petits morceaux à la suite : il n’y a aucune adresse à enregistrer.${kind === 'video' ? ' Loupe peut seulement prendre en photo l’image affichée.' : ''}`;
+      view.site = t('cantDownload');
+      view.note = t(kind === 'video' ? 'streamNoteVideo' : 'streamNoteAudio', here);
       view.actions = kind === 'video' ? [capture] : [];
     } else {
-      view.site = kind === 'frame' ? 'Cadre fabriqué par la page' : 'Sans adresse';
-      view.note = kind === 'frame' ? 'Ce cadre n’a pas d’adresse : la page écrit son contenu elle-même.' : '';
+      view.site = t(kind === 'frame' ? 'frameMade' : 'noAddress');
+      view.note = kind === 'frame' ? t('frameNoAddress') : '';
       view.actions = [{ ...capture, main: true }];
     }
 
@@ -947,29 +955,29 @@
 
   const madeView = (subject, node) => {
     const rect = node.getBoundingClientRect();
-    const capture = { text: 'Capturer en image', run: () => snap(node, document.title) };
+    const capture = { text: t('captureImage'), run: () => snap(node, document.title) };
     if (subject.kind === 'canvas') {
       return {
-        site: 'Dessiné par le site',
-        note: 'Pas de fichier : le site dessine cette zone lui-même, image par image.',
-        rows: [{ label: 'Taille', value: `${sized(subject.width, subject.height)} px` }],
+        site: t('drawnBySite'),
+        note: t('drawnNote'),
+        rows: [{ label: t('rowSize'), value: `${sized(subject.width, subject.height)} px` }],
         more: [],
         actions: [{ ...capture, main: true }],
       };
     }
     const file = drawingFile(node);
-    const name = node.getAttribute('aria-label') || node.querySelector('title')?.textContent || 'dessin';
+    const name = node.getAttribute('aria-label') || node.querySelector('title')?.textContent || t('drawingFile');
     return {
-      site: 'Dessin écrit dans la page',
-      note: 'Un dessin SVG : des formes décrites dans le code de la page, sans fichier à part.',
+      site: t('svgInPage'),
+      note: t('svgNote'),
       rows: [
-        { label: 'Poids', value: weigh(dataWeight(file)) },
-        { label: 'Format', value: 'SVG' },
-        { label: 'Taille', value: `${sized(rect.width, rect.height)} px` },
-        colorRow('Couleur', getComputedStyle(node).color),
+        { label: t('rowWeight'), value: weigh(dataWeight(file)) },
+        { label: t('rowFormat'), value: 'SVG' },
+        { label: t('rowSize'), value: `${sized(rect.width, rect.height)} px` },
+        colorRow(t('rowColor'), getComputedStyle(node).color),
       ],
       more: [],
-      actions: [{ text: 'Télécharger en SVG', main: true, run: async () => told(await send({ loupe: 'save', data: file, name })) }, capture],
+      actions: [{ text: t('downloadSvg'), main: true, run: async () => told(await send({ loupe: 'save', data: file, name })) }, capture],
     };
   };
 
@@ -985,26 +993,26 @@
     const name = words.slice(0, 40).replace(/[\s,;:.!?…]+$/, '') || document.title;
     return {
       site: GENERIC[used.toLowerCase()] ?? used,
-      path: words ? [`« ${short(words, 90)} »`] : [],
-      note: missing.length ? `Le site demandait d’abord ${missing.map((family) => `« ${family} »`).join(', ')}, ${missing.length > 1 ? 'absentes' : 'absente'} de ton PC.` : '',
+      path: words ? [t('quoted', short(words, 90))] : [],
+      note: missing.length ? t(missing.length > 1 ? 'missingFontsMany' : 'missingFontsOne', missing.map((family) => t('quoted', family)).join(', ')) : '',
       rows: [
-        { label: 'Taille', value: pixels(style.fontSize) },
-        { label: 'Graisse', value: WEIGHTS[style.fontWeight] ? `${WEIGHTS[style.fontWeight]} · ${style.fontWeight}` : style.fontWeight },
-        colorRow('Couleur', style.color),
+        { label: t('rowFontSize'), value: pixels(style.fontSize) },
+        { label: t('rowFontWeight'), value: WEIGHTS[style.fontWeight] ? `${WEIGHTS[style.fontWeight]} · ${style.fontWeight}` : style.fontWeight },
+        colorRow(t('rowColor'), style.color),
         backdrop(node),
       ],
       more: [
-        { label: 'Style', value: style.fontStyle === 'italic' ? 'Italique' : '' },
-        { label: 'Interligne', value: style.lineHeight === 'normal' ? '' : pixels(style.lineHeight) },
-        { label: 'Espacement des lettres', value: spacing ? pixels(spacing) : '' },
-        { label: 'Polices demandées', value: asked.join(', '), tall: true },
+        { label: t('rowStyle'), value: style.fontStyle === 'italic' ? t('italic') : '' },
+        { label: t('rowLineHeight'), value: style.lineHeight === 'normal' ? '' : pixels(style.lineHeight) },
+        { label: t('rowLetterSpacing'), value: spacing ? pixels(spacing) : '' },
+        { label: t('rowFontsAsked'), value: asked.join(', '), tall: true },
         ...lookRows(node).slice(1),
       ],
       actions: [
-        { text: 'Copier le texte', main: true, run: () => copy(textOf(node), 'Texte copié.') },
-        { text: 'Enregistrer en .txt', run: async () => told(await send({ loupe: 'save', data: `data:text/plain;charset=utf-8,${encodeURIComponent(textOf(node))}`, name })) },
-        { text: 'Capturer en image', run: () => snap(node, name) },
-        { text: 'Données', run: () => openData(node, textOf(node)) },
+        { text: t('copyText'), main: true, run: () => copy(textOf(node), t('textCopied')) },
+        { text: t('saveTxt'), run: async () => told(await send({ loupe: 'save', data: `data:text/plain;charset=utf-8,${encodeURIComponent(textOf(node))}`, name })) },
+        { text: t('captureImage'), run: () => snap(node, name) },
+        { text: t('data'), run: () => openData(node, textOf(node)) },
       ],
     };
   };
@@ -1014,17 +1022,17 @@
     const rows = lookRows(node);
     return {
       site: `${sized(rect.width, rect.height)} px`,
-      note: rows.some((row) => row.value) ? '' : 'Ce bloc ne dessine rien lui-même : ni fond, ni bord. Essaie ↑ pour viser plus large.',
+      note: rows.some((row) => row.value) ? '' : t('blockEmpty'),
       rows,
       more: [],
       actions: [
         { text: 'Capturer en image', main: true, run: () => snap(node, node.getAttribute('aria-label') || document.title) },
-        { text: 'Données', run: () => openData(node, (node.innerText ?? '').trim().split('\n')[0]) },
+        { text: t('data'), run: () => openData(node, (node.innerText ?? '').trim().split('\n')[0]) },
       ],
     };
   };
 
-  const labelOf = (subject, node) => (subject.back ? 'Image de fond' : LABELS[subject.kind] ?? KINDS[node.localName] ?? 'Bloc');
+  const labelOf = (subject, node) => (subject.back ? t('bgImage') : LABELS[subject.kind] ?? KINDS[node.localName] ?? t('block'));
 
   const rowOf = (entry) => {
     const line = element(entry.color || entry.go ? 'button' : 'div', entry.tall ? 'row tall' : entry.go ? 'row item' : 'row');
@@ -1034,8 +1042,8 @@
       const dot = element('span', 'dot');
       dot.style.background = entry.paint;
       value.append(dot);
-      line.title = 'Copier cette couleur';
-      line.addEventListener('click', () => copy(entry.color, `Couleur ${entry.color} copiée.`));
+      line.title = t('copyColor');
+      line.addEventListener('click', () => copy(entry.color, t('colorCopied', entry.color)));
     }
     value.append(entry.value);
     line.append(element('span', 'label', entry.label), value);
@@ -1052,7 +1060,7 @@
     const fold = element('button', view.open ? 'row fold open' : 'row fold');
     const arrow = element('span', 'value');
     arrow.append(icon('M4 6l4 4 4-4'));
-    fold.append(element('span', 'label', view.open ? 'Moins' : 'Plus'), arrow);
+    fold.append(element('span', 'label', t(view.open ? 'less' : 'more')), arrow);
     fold.setAttribute('aria-expanded', String(Boolean(view.open)));
     fold.addEventListener('click', () => {
       view.open = !view.open;
@@ -1104,7 +1112,7 @@
           try {
             await action.run();
           } catch {
-            say('Loupe a rencontré une erreur sur cet élément.', true);
+            say(t('elementError'), true);
           }
           button.disabled = false;
         });
@@ -1126,7 +1134,7 @@
     const rect = node.getBoundingClientRect();
     const views = { image: fileView, video: fileView, audio: fileView, frame: fileView, canvas: madeView, drawing: madeView, text: textView };
     const view = (views[subject.kind] ?? blockView)(subject, node, fresh);
-    showCard(node, view, labelOf(subject, node), subject.kind === 'block' ? '' : `${sized(rect.width, rect.height)} à l’écran`);
+    showCard(node, view, labelOf(subject, node), subject.kind === 'block' ? '' : t('onScreen', sized(rect.width, rect.height)));
   };
 
   // ------------------------------------------------------------ explorateur
@@ -1168,7 +1176,7 @@
     const end = endOf(new URL(address));
     const kind = IMAGES.has(end) ? 'image' : VIDEOS.has(end) ? 'video' : SOUNDS.has(end) ? 'audio' : 'other';
     const view = fileView({ kind, url: address, said: '' }, null, () => mine === ticket, anchor);
-    showCard(anchor, view, LABELS[kind] ?? 'Fichier', '');
+    showCard(anchor, view, LABELS[kind] ?? t('file'), '');
   };
 
   // Le premier étage : les serveurs avec lesquels la page échange.
@@ -1182,7 +1190,7 @@
     const rows = [...counts]
       .sort((first, second) => second[1] - first[1])
       .map(([origin, count]) => ({ label: new URL(origin).host, value: number(count), go: () => openFolder(`${origin}/`, anchor) }));
-    showCard(anchor, { site: 'Serveurs de cette page', path: [], note: 'Tous les sites avec lesquels cette page échange des fichiers ou vers lesquels elle renvoie.', rows, more: [], actions: [] }, 'Explorateur', `${number(rows.length)} serveurs`);
+    showCard(anchor, { site: t('pageServers'), path: [], note: t('serversNote'), rows, more: [], actions: [] }, t('explorer'), tp('serversCount', rows.length));
   };
 
   // Un dossier : ce que la page en connaît, puis ce que le serveur veut bien
@@ -1202,24 +1210,24 @@
     for (const full of known()) take(full);
 
     const steps = base.pathname.split('/').filter(Boolean);
-    const parts = [crumb('Serveurs', () => openHosts(anchor)), ' › ', crumb(base.hostname, () => openFolder(`${base.origin}/`, anchor))];
+    const parts = [crumb(t('servers'), () => openHosts(anchor)), ' › ', crumb(base.hostname, () => openFolder(`${base.origin}/`, anchor))];
     steps.forEach((step, index) => {
       const target = `${base.origin}/${steps.slice(0, index + 1).join('/')}/`;
       parts.push(' › ', index === steps.length - 1 ? element('b', '', short(tidy(step), 28)) : crumb(short(tidy(step), 28), () => openFolder(target, anchor)));
     });
 
-    const view = { site: steps.length ? tidy(steps.at(-1)) : base.hostname, path: parts, note: 'Je demande au serveur ce que contient ce dossier…', rows: [], more: [], actions: [] };
+    const view = { site: steps.length ? tidy(steps.at(-1)) : base.hostname, path: parts, note: t('askingFolder'), rows: [], more: [], actions: [] };
     const list = () => {
       const most = 300;
       const rows = [
-        ...[...folders].sort(([first], [second]) => first.localeCompare(second, 'fr')).map(([name, count]) => ({ label: `${short(tidy(name), 34)} /`, value: count ? number(count) : '›', go: () => openFolder(`${base.href}${name}/`, anchor) })),
-        ...[...files].sort((first, second) => first[1].localeCompare(second[1], 'fr')).map(([full, name]) => ({ label: name, value: FORMATS[endOf(new URL(full))] ?? (endOf(new URL(full)).toUpperCase() || 'page'), go: () => openFile(full, anchor) })),
+        ...[...folders].sort(([first], [second]) => first.localeCompare(second, LANG)).map(([name, count]) => ({ label: `${short(tidy(name), 34)} /`, value: count ? number(count) : '›', go: () => openFolder(`${base.href}${name}/`, anchor) })),
+        ...[...files].sort((first, second) => first[1].localeCompare(second[1], LANG)).map(([full, name]) => ({ label: name, value: FORMATS[endOf(new URL(full))] ?? (endOf(new URL(full)).toUpperCase() || t('pageType')), go: () => openFile(full, anchor) })),
       ];
-      view.rows = rows.length > most ? [...rows.slice(0, most), { label: `… et ${number(rows.length - most)} autres`, value: ' ' }] : rows;
-      dims.textContent = `${number(folders.size)} dossier${folders.size > 1 ? 's' : ''} · ${number(files.size)} fichier${files.size > 1 ? 's' : ''}`;
+      view.rows = rows.length > most ? [...rows.slice(0, most), { label: t('andMore', number(rows.length - most)), value: ' ' }] : rows;
+      dims.textContent = `${tp('folders', folders.size)} · ${tp('files', files.size)}`;
     };
     list();
-    showCard(anchor, view, 'Dossier', dims.textContent);
+    showCard(anchor, view, t('folder'), dims.textContent);
     list();
 
     send({ loupe: 'folder', url: base.href }).then((answer) => {
@@ -1229,9 +1237,9 @@
           if (entry.folder) folders.set(entry.name, folders.get(entry.name) ?? 0);
           else take(entry.url);
         }
-        view.note = 'Le serveur publie la liste de ce dossier : tout ce qu’il contient est ici.';
+        view.note = t('listingPublished');
       } else {
-        view.note = `Le serveur ne montre pas le contenu de ce dossier${answer.status ? ` (réponse ${answer.status})` : ''}. Voici seulement ce que cette page en connaît.`;
+        view.note = t('listingHidden', answer.status ? t('responseStatus', answer.status) : '');
       }
       note.textContent = view.note;
       list();
@@ -1263,7 +1271,7 @@
     } catch {
       // pas des données rangées : une page, dont on lit le texte sans rien exécuter
       const page = new DOMParser().parseFromString(body, 'text/html');
-      return plain(page.documentElement?.textContent ?? body).includes(needle) ? 'texte' : null;
+      return plain(page.documentElement?.textContent ?? body).includes(needle) ? t('hitText') : null;
     }
     const walk = (value, trail, depth) => {
       if (typeof value === 'string') return plain(value).includes(needle) ? trail : null;
@@ -1275,7 +1283,7 @@
       return null;
     };
     const hit = walk(data, [], 0);
-    return hit ? hit.join(' › ') || 'texte' : null;
+    return hit ? hit.join(' › ') || t('hitText') : null;
   };
 
   // D'où vient un texte : la liste des adresses de données de la page, et une
@@ -1286,7 +1294,7 @@
     const said = words.replace(/\s+/g, ' ').trim();
     const needle = plain(said).slice(0, 60);
     const entries = [
-      { address: here, label: 'La page elle-même' },
+      { address: here, label: t('pageItself') },
       ...dataAddresses()
         .filter((address) => address !== here)
         .map((address) => {
@@ -1296,11 +1304,11 @@
     ];
     const count = entries.length - 1;
     const view = {
-      site: 'Données de la page',
-      path: needle.length >= 3 ? [`« ${short(said, 70)} »`] : [],
+      site: t('pageData'),
+      path: needle.length >= 3 ? [t('quoted', short(said, 70))] : [],
       note: count
-        ? `Depuis son chargement, la page a interrogé ${number(count)} adresse${count > 1 ? 's' : ''} pour remplir son contenu. La base de données reste derrière le serveur : on ne voit que ces adresses et leurs réponses.`
-        : 'Depuis son chargement, la page n’a interrogé aucune adresse de données : son contenu est sans doute écrit dans la page elle-même.',
+        ? tp('dataNote', count)
+        : t('dataNoteNone'),
       rows: [],
       more: [],
       actions: [],
@@ -1310,7 +1318,7 @@
     };
 
     const search = async () => {
-      say('Je relis ces adresses…');
+      say(t('rereading'));
       const queue = [...entries];
       const read = async () => {
         for (let entry; (entry = queue.shift()); ) {
@@ -1339,15 +1347,15 @@
       list();
       paint();
       const hits = entries.filter((entry) => entry.hit);
-      const also = unread ? ` ${number(unread)} adresse${unread > 1 ? 's n’ont' : ' n’a'} pas pu être relue${unread > 1 ? 's' : ''}.` : '';
-      if (!hits.length) return say(`Introuvable dans ce que Loupe peut relire. Ce texte vient peut-être d’un envoi que Loupe ne peut pas rejouer, ou la page le fabrique elle-même.${also}`, true);
-      if (hits.every((entry) => entry.address === here)) return say(`Ce texte est écrit dans la page elle-même : il ne vient pas d’une demande à part.${also}`);
-      say(`Trouvé : en tête de liste, avec l’endroit où il est rangé dans la réponse.${also}`);
+      const also = unread ? ` ${tp('notReread', unread)}` : '';
+      if (!hits.length) return say(t('notFound', also), true);
+      if (hits.every((entry) => entry.address === here)) return say(t('inPageItself', also));
+      say(t('found', also));
     };
 
-    if (needle.length >= 3) view.actions = [{ text: 'Chercher mon texte', main: true, run: search }];
+    if (needle.length >= 3) view.actions = [{ text: t('searchText'), main: true, run: search }];
     list();
-    showCard(anchor, view, 'Données', `${number(count)} adresse${count > 1 ? 's' : ''}`);
+    showCard(anchor, view, t('data'), tp('addresses', count));
   };
 
   const closeCard = () => {

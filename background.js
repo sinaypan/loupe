@@ -3,6 +3,9 @@
 // site, enregistrer un fichier dans Téléchargements, photographier l'onglet.
 // Rien ne tourne tant que la loupe ne demande rien.
 
+// Textes dans la langue de Chrome (_locales).
+const t = (key, ...subs) => chrome.i18n.getMessage(key, subs.map(String)) || key;
+
 const FOLDER = 'Loupe';
 
 // Les seuls genres de fichiers que Loupe enregistre, et l'extension donnée à
@@ -114,11 +117,11 @@ const ask = async (url) => {
 
 const details = async ({ url: address }, tab) => {
   const url = outside(address, tab);
-  if (!url) return fail('Adresse hors du web.');
+  if (!url) return fail(t('outsideWeb'));
   try {
     return await ask(url);
   } catch {
-    return fail('Le serveur n’a pas répondu.');
+    return fail(t('noAnswer'));
   }
 };
 
@@ -149,7 +152,7 @@ const store = async (source, name, extension) => {
   try {
     id = await chrome.downloads.download({ url: source, filename: `${FOLDER}/${clean(name)}.${extension}`, conflictAction: 'uniquify', saveAs: false });
   } catch {
-    return fail('Chrome a refusé d’enregistrer ce fichier.');
+    return fail(t('chromeRefusedSave'));
   }
   for (const wait of [250, 500, 1000]) {
     await sleep(wait);
@@ -159,7 +162,7 @@ const store = async (source, name, extension) => {
       if (item?.state === 'in_progress') await chrome.downloads.cancel(id).catch(() => {});
       if (page && item.state === 'complete') await chrome.downloads.removeFile(id).catch(() => {});
       await chrome.downloads.erase({ id }).catch(() => {});
-      return fail('Le site a refusé d’envoyer le fichier.');
+      return fail(t('siteRefused'));
     }
     if (item.state === 'complete') return { ok: true, id, done: true };
   }
@@ -168,12 +171,12 @@ const store = async (source, name, extension) => {
 
 const download = async ({ url: address, name }, tab) => {
   const url = outside(address, tab);
-  if (!url) return fail('Adresse hors du web.');
+  if (!url) return fail(t('outsideWeb'));
   const told = await ask(url).catch(() => null);
   // Le serveur dit ce qu'est le fichier ; s'il ne dit rien de précis, la fin de l'adresse.
   const vague = !told?.type || /octet-stream$/.test(told.type);
   const extension = TYPES[told?.type] ?? (vague ? extensionIn(url) : '');
-  if (!extension) return fail('Ce fichier n’est ni une image, ni une vidéo, ni un son.');
+  if (!extension) return fail(t('notMedia'));
   return store(url.href, name, extension);
 };
 
@@ -182,7 +185,7 @@ const download = async ({ url: address, name }, tab) => {
 const save = async ({ data, name }) => {
   const type = /^data:([a-z0-9.+/-]+)[;,]/i.exec(String(data).slice(0, 80))?.[1].toLowerCase();
   const extension = TYPES[type];
-  if (!extension) return fail('Ce fichier n’est ni une image, ni une vidéo, ni un son.');
+  if (!extension) return fail(t('notMedia'));
   return store(data, name, extension);
 };
 
@@ -195,12 +198,12 @@ const toDataUrl = async (blob) => {
 
 // La photo d'un bloc : celle de l'onglet affiché, recoupée au cadre du bloc.
 const capture = async ({ rect, view, name }, tab) => {
-  if (!tab.active) return fail('L’onglet n’est plus affiché.');
+  if (!tab.active) return fail(t('tabHidden'));
   let shot;
   try {
     shot = await chrome.tabs.captureVisibleTab(tab.windowId, { format: 'png' });
   } catch {
-    return fail('Chrome n’a pas laissé photographier la page. Reprends la loupe depuis l’icône, puis réessaie.');
+    return fail(t('noPhoto'));
   }
   const bitmap = await createImageBitmap(await (await fetch(shot)).blob());
   const scale = bitmap.width / Math.max(1, Number(view?.width) || bitmap.width);
@@ -209,7 +212,7 @@ const capture = async ({ rect, view, name }, tab) => {
   const top = within(rect?.top, bitmap.height);
   const width = within(rect?.right, bitmap.width) - left;
   const height = within(rect?.bottom, bitmap.height) - top;
-  if (width < 1 || height < 1) return fail('Ce bloc n’est pas visible à l’écran.');
+  if (width < 1 || height < 1) return fail(t('notVisible'));
   const canvas = new OffscreenCanvas(width, height);
   canvas.getContext('2d').drawImage(bitmap, left, top, width, height, 0, 0, width, height);
   bitmap.close();
@@ -219,7 +222,7 @@ const capture = async ({ rect, view, name }, tab) => {
 // Ouvre le dossier sur le fichier, s'il vient bien de Loupe.
 const show = async ({ id }) => {
   const [item] = Number.isInteger(id) ? await chrome.downloads.search({ id }) : [];
-  if (item?.byExtensionId !== chrome.runtime.id) return fail('Fichier introuvable.');
+  if (item?.byExtensionId !== chrome.runtime.id) return fail(t('fileMissing'));
   chrome.downloads.show(id);
   return { ok: true };
 };
@@ -228,7 +231,7 @@ const show = async ({ id }) => {
 // « Index of »). On la lit telle quelle : aucun nom de fichier n'est deviné.
 const folder = async ({ url: address }, tab) => {
   const url = outside(address, tab);
-  if (!url || !url.pathname.endsWith('/')) return fail('Adresse hors du web.');
+  if (!url || !url.pathname.endsWith('/')) return fail(t('outsideWeb'));
   let response;
   try {
     response = await fetch(url, { credentials: 'omit', cache: 'no-store', referrerPolicy: 'no-referrer', signal: AbortSignal.timeout(6000) });
@@ -261,7 +264,7 @@ const JOBS = { details, download, save, capture, show, folder };
 chrome.runtime.onMessage.addListener((message, sender, reply) => {
   // Seule la loupe posée dans un onglet parle au fond : ni une page, ni une autre extension.
   if (sender.id !== chrome.runtime.id || !sender.tab || !Object.hasOwn(JOBS, message?.loupe)) return;
-  JOBS[message.loupe](message, sender.tab).then(reply, () => reply(fail('Loupe a rencontré une erreur.')));
+  JOBS[message.loupe](message, sender.tab).then(reply, () => reply(fail(t('loupeError'))));
   return true;
 });
 

@@ -7,7 +7,7 @@ let tab = null;
 // Chrome protège ses propres pages, sa boutique et les fichiers ouverts depuis le PC.
 const refuse = () => {
   aim.disabled = true;
-  hint.textContent = 'Chrome ne permet pas d’inspecter cette page. Essaie sur un site.';
+  hint.textContent = t('popupProtected');
 };
 
 aim.addEventListener('click', async () => {
@@ -35,5 +35,5 @@ aim.addEventListener('click', async () => {
     return;
   }
   byId('site').textContent = url.hostname.replace(/^www\./, '');
-  hint.textContent = 'Clique ensuite sur une image, une vidéo, un texte ou un bloc de la page pour ouvrir sa fiche.';
+  hint.textContent = t('popupHint');
 })();

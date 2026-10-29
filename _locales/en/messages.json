@@ -1,0 +1,706 @@
+{
+  "extName": {
+    "message": "Loupe"
+  },
+  "extDesc": {
+    "message": "Click an image, a video, a text or a block on a page to see where it comes from, how heavy it is and how it is made, then download it."
+  },
+  "cmdAim": {
+    "message": "Take the loupe on the current page"
+  },
+  "takeLoupe": {
+    "message": "Take the loupe"
+  },
+  "popupProtected": {
+    "message": "Chrome does not allow inspecting this page. Try on a website."
+  },
+  "popupHint": {
+    "message": "Then click an image, a video, a text or a block on the page to open its card."
+  },
+  "kindAside": {
+    "message": "Column"
+  },
+  "kindHeader": {
+    "message": "Header"
+  },
+  "kindFooter": {
+    "message": "Footer"
+  },
+  "kindNav": {
+    "message": "Menu"
+  },
+  "kindDialog": {
+    "message": "Window"
+  },
+  "kindForm": {
+    "message": "Form"
+  },
+  "kindButton": {
+    "message": "Button"
+  },
+  "kindLink": {
+    "message": "Link"
+  },
+  "kindList": {
+    "message": "List"
+  },
+  "kindRow": {
+    "message": "Row"
+  },
+  "kindArticle": {
+    "message": "Article"
+  },
+  "kindTable": {
+    "message": "Table"
+  },
+  "labelImage": {
+    "message": "Image"
+  },
+  "labelVideo": {
+    "message": "Video"
+  },
+  "labelAudio": {
+    "message": "Sound"
+  },
+  "labelFrame": {
+    "message": "Frame"
+  },
+  "labelCanvas": {
+    "message": "Site drawing"
+  },
+  "labelDrawing": {
+    "message": "Drawing"
+  },
+  "labelText": {
+    "message": "Text"
+  },
+  "fmtApng": {
+    "message": "Animated PNG"
+  },
+  "w100": {
+    "message": "Thin"
+  },
+  "w200": {
+    "message": "Extra light"
+  },
+  "w300": {
+    "message": "Light"
+  },
+  "w400": {
+    "message": "Regular"
+  },
+  "w500": {
+    "message": "Medium"
+  },
+  "w600": {
+    "message": "Semibold"
+  },
+  "w700": {
+    "message": "Bold"
+  },
+  "w800": {
+    "message": "Extra bold"
+  },
+  "w900": {
+    "message": "Black"
+  },
+  "fontSerif": {
+    "message": "System serif font"
+  },
+  "fontSans": {
+    "message": "System sans-serif font"
+  },
+  "fontMono": {
+    "message": "System monospace font"
+  },
+  "fontSystem": {
+    "message": "System font"
+  },
+  "fontRounded": {
+    "message": "System rounded font"
+  },
+  "fontCursive": {
+    "message": "System handwriting font"
+  },
+  "fontFantasy": {
+    "message": "System fantasy font"
+  },
+  "fontEmoji": {
+    "message": "Emoji font"
+  },
+  "fontMath": {
+    "message": "Math font"
+  },
+  "clickWhat": {
+    "message": "Click what you want to know about"
+  },
+  "aimWider": {
+    "message": "↑ ↓ to aim wider"
+  },
+  "done": {
+    "message": "Done"
+  },
+  "moveBar": {
+    "message": "Move the bar"
+  },
+  "closeCard": {
+    "message": "Close the card"
+  },
+  "params_one": {
+    "message": "+ $COUNT$ parameter",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "params_other": {
+    "message": "+ $COUNT$ parameters",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "reloaded": {
+    "message": "Loupe was just reloaded. Reload the page (F5), then take the loupe again."
+  },
+  "copyRefused": {
+    "message": "Chrome did not allow copying."
+  },
+  "saveFailed": {
+    "message": "Saving failed."
+  },
+  "showInFolder": {
+    "message": "Show in folder"
+  },
+  "savedIn": {
+    "message": "Saved in Downloads › Loupe.$EXTRA$",
+    "placeholders": {
+      "extra": {
+        "content": "$1"
+      }
+    }
+  },
+  "savingIn": {
+    "message": "Downloading to Downloads › Loupe.$EXTRA$",
+    "placeholders": {
+      "extra": {
+        "content": "$1"
+      }
+    }
+  },
+  "onlyVisible": {
+    "message": " Only the part visible on screen is in the picture."
+  },
+  "downloading": {
+    "message": "Downloading…"
+  },
+  "largeRefused": {
+    "message": " The site refused the large version: this is the one shown."
+  },
+  "largestOffered": {
+    "message": " This is the largest version the site offers."
+  },
+  "captureImage": {
+    "message": "Capture as image"
+  },
+  "siteRefused": {
+    "message": "The site refused to send the file."
+  },
+  "full": {
+    "message": "Full"
+  },
+  "rowBorder": {
+    "message": "Border"
+  },
+  "rowBackground": {
+    "message": "Background"
+  },
+  "aGradient": {
+    "message": "A gradient"
+  },
+  "anImage": {
+    "message": "An image"
+  },
+  "rowRounding": {
+    "message": "Rounding"
+  },
+  "rowShadow": {
+    "message": "Shadow"
+  },
+  "rowPadding": {
+    "message": "Padding"
+  },
+  "rowWeight": {
+    "message": "File size"
+  },
+  "rowFormat": {
+    "message": "Format"
+  },
+  "rowSize": {
+    "message": "Dimensions"
+  },
+  "rowFontSize": {
+    "message": "Size"
+  },
+  "rowFontWeight": {
+    "message": "Weight"
+  },
+  "rowDuration": {
+    "message": "Duration"
+  },
+  "rowLoaded": {
+    "message": "Loaded"
+  },
+  "rowServer": {
+    "message": "Server"
+  },
+  "rowLarger": {
+    "message": "Largest version"
+  },
+  "rowModified": {
+    "message": "Last modified"
+  },
+  "rowProtocol": {
+    "message": "Protocol"
+  },
+  "rowDescription": {
+    "message": "Description"
+  },
+  "rowSoftware": {
+    "message": "Server software"
+  },
+  "rowAddress": {
+    "message": "Address"
+  },
+  "rowColor": {
+    "message": "Color"
+  },
+  "rowStyle": {
+    "message": "Style"
+  },
+  "italic": {
+    "message": "Italic"
+  },
+  "rowLineHeight": {
+    "message": "Line height"
+  },
+  "rowLetterSpacing": {
+    "message": "Letter spacing"
+  },
+  "rowFontsAsked": {
+    "message": "Fonts asked for"
+  },
+  "copyAddress": {
+    "message": "Copy the address"
+  },
+  "addressCopied": {
+    "message": "Address copied."
+  },
+  "open": {
+    "message": "Open"
+  },
+  "explore": {
+    "message": "Explore"
+  },
+  "frameNote": {
+    "message": "A frame: another page, shown inside this one."
+  },
+  "download": {
+    "message": "Download"
+  },
+  "available": {
+    "message": "available"
+  },
+  "writtenInPage": {
+    "message": "Written in the page"
+  },
+  "writtenNote": {
+    "message": "No separate file: this image is written in the page’s own code."
+  },
+  "madeByPage": {
+    "message": "Made by the page"
+  },
+  "madeNote": {
+    "message": "The site made this image in your browser: it has no address on the Internet."
+  },
+  "cantDownload": {
+    "message": "Can’t download here"
+  },
+  "streamNoteVideo": {
+    "message": "$HERE$ does not send this video as one file, but as hundreds of small pieces in a row: there is no address to save. Loupe can only take a picture of the frame on screen.",
+    "placeholders": {
+      "here": {
+        "content": "$1"
+      }
+    }
+  },
+  "streamNoteAudio": {
+    "message": "$HERE$ does not send this sound as one file, but as hundreds of small pieces in a row: there is no address to save.",
+    "placeholders": {
+      "here": {
+        "content": "$1"
+      }
+    }
+  },
+  "frameMade": {
+    "message": "Frame made by the page"
+  },
+  "noAddress": {
+    "message": "No address"
+  },
+  "frameNoAddress": {
+    "message": "This frame has no address: the page writes its content itself."
+  },
+  "drawnBySite": {
+    "message": "Drawn by the site"
+  },
+  "drawnNote": {
+    "message": "No file: the site draws this area itself, frame by frame."
+  },
+  "svgInPage": {
+    "message": "Drawing written in the page"
+  },
+  "svgNote": {
+    "message": "An SVG drawing: shapes described in the page’s code, with no separate file."
+  },
+  "downloadSvg": {
+    "message": "Download as SVG"
+  },
+  "drawingFile": {
+    "message": "drawing"
+  },
+  "missingFontsOne": {
+    "message": "The site first asked for $FONTS$, which is not on your PC.",
+    "placeholders": {
+      "fonts": {
+        "content": "$1"
+      }
+    }
+  },
+  "missingFontsMany": {
+    "message": "The site first asked for $FONTS$, which are not on your PC.",
+    "placeholders": {
+      "fonts": {
+        "content": "$1"
+      }
+    }
+  },
+  "quoted": {
+    "message": "“$TEXT$”",
+    "placeholders": {
+      "text": {
+        "content": "$1"
+      }
+    }
+  },
+  "copyText": {
+    "message": "Copy the text"
+  },
+  "textCopied": {
+    "message": "Text copied."
+  },
+  "saveTxt": {
+    "message": "Save as .txt"
+  },
+  "data": {
+    "message": "Data"
+  },
+  "blockEmpty": {
+    "message": "This block draws nothing itself: no background, no border. Try ↑ to aim wider."
+  },
+  "bgImage": {
+    "message": "Background image"
+  },
+  "block": {
+    "message": "Block"
+  },
+  "copyColor": {
+    "message": "Copy this color"
+  },
+  "colorCopied": {
+    "message": "Color $COLOR$ copied.",
+    "placeholders": {
+      "color": {
+        "content": "$1"
+      }
+    }
+  },
+  "less": {
+    "message": "Less"
+  },
+  "more": {
+    "message": "More"
+  },
+  "elementError": {
+    "message": "Loupe ran into an error on this element."
+  },
+  "onScreen": {
+    "message": "$SIZE$ on screen",
+    "placeholders": {
+      "size": {
+        "content": "$1"
+      }
+    }
+  },
+  "file": {
+    "message": "File"
+  },
+  "pageServers": {
+    "message": "Servers of this page"
+  },
+  "serversNote": {
+    "message": "All the sites this page exchanges files with or links to."
+  },
+  "explorer": {
+    "message": "Explorer"
+  },
+  "serversCount_one": {
+    "message": "$COUNT$ server",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "serversCount_other": {
+    "message": "$COUNT$ servers",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "servers": {
+    "message": "Servers"
+  },
+  "askingFolder": {
+    "message": "Asking the server what this folder contains…"
+  },
+  "andMore": {
+    "message": "… and $COUNT$ more",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "folders_one": {
+    "message": "$COUNT$ folder",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "folders_other": {
+    "message": "$COUNT$ folders",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "files_one": {
+    "message": "$COUNT$ file",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "files_other": {
+    "message": "$COUNT$ files",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "folder": {
+    "message": "Folder"
+  },
+  "listingPublished": {
+    "message": "The server publishes the listing of this folder: everything it contains is here."
+  },
+  "listingHidden": {
+    "message": "The server does not show the content of this folder$STATUS$. Here is only what this page knows about it.",
+    "placeholders": {
+      "status": {
+        "content": "$1"
+      }
+    }
+  },
+  "responseStatus": {
+    "message": " (response $CODE$)",
+    "placeholders": {
+      "code": {
+        "content": "$1"
+      }
+    }
+  },
+  "pageType": {
+    "message": "page"
+  },
+  "hitText": {
+    "message": "text"
+  },
+  "pageItself": {
+    "message": "The page itself"
+  },
+  "pageData": {
+    "message": "Page data"
+  },
+  "dataNote_one": {
+    "message": "Since it loaded, the page has queried $COUNT$ address to fill its content. The database stays behind the server: only these addresses and their answers can be seen.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "dataNote_other": {
+    "message": "Since it loaded, the page has queried $COUNT$ addresses to fill its content. The database stays behind the server: only these addresses and their answers can be seen.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "dataNoteNone": {
+    "message": "Since it loaded, the page has not queried any data address: its content is probably written in the page itself."
+  },
+  "rereading": {
+    "message": "Reading these addresses again…"
+  },
+  "notReread_one": {
+    "message": "$COUNT$ address could not be read again.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "notReread_other": {
+    "message": "$COUNT$ addresses could not be read again.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "notFound": {
+    "message": "Not found in what Loupe can read again. This text may come from a request Loupe cannot replay, or the page makes it itself.$ALSO$",
+    "placeholders": {
+      "also": {
+        "content": "$1"
+      }
+    }
+  },
+  "inPageItself": {
+    "message": "This text is written in the page itself: it does not come from a separate request.$ALSO$",
+    "placeholders": {
+      "also": {
+        "content": "$1"
+      }
+    }
+  },
+  "found": {
+    "message": "Found: at the top of the list, with the place where it sits in the answer.$ALSO$",
+    "placeholders": {
+      "also": {
+        "content": "$1"
+      }
+    }
+  },
+  "searchText": {
+    "message": "Find my text"
+  },
+  "addresses_one": {
+    "message": "$COUNT$ address",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "addresses_other": {
+    "message": "$COUNT$ addresses",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "loadedCache": {
+    "message": "from Chrome’s cache"
+  },
+  "loadedNet": {
+    "message": "from the Internet, in $TIME$",
+    "placeholders": {
+      "time": {
+        "content": "$1"
+      }
+    }
+  },
+  "sizeBytes": {
+    "message": "$N$ bytes",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
+  },
+  "sizeKB": {
+    "message": "$N$ KB",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
+  },
+  "sizeMB": {
+    "message": "$N$ MB",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
+  },
+  "sizeGB": {
+    "message": "$N$ GB",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
+  },
+  "outsideWeb": {
+    "message": "Address outside the web."
+  },
+  "noAnswer": {
+    "message": "The server did not answer."
+  },
+  "chromeRefusedSave": {
+    "message": "Chrome refused to save this file."
+  },
+  "notMedia": {
+    "message": "This file is not an image, a video or a sound."
+  },
+  "tabHidden": {
+    "message": "The tab is no longer shown."
+  },
+  "noPhoto": {
+    "message": "Chrome did not allow taking a picture of the page. Take the loupe again from the icon, then try again."
+  },
+  "notVisible": {
+    "message": "This block is not visible on screen."
+  },
+  "fileMissing": {
+    "message": "File not found."
+  },
+  "loupeError": {
+    "message": "Loupe ran into an error."
+  }
+}
